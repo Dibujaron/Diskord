@@ -15,17 +15,15 @@ import com.jessecorbett.diskord.dsl.embed
 /**
  * An [EventListener] inheritor adding a [ClientStore] and related convenience methods.
  *
- * @param token a user token used for the clientStore.
+ * @param clientStore A common [ClientStore] for use by a class implementing this one.
  * @constructor creates a bare bones [EventListener] but with convenience access methods and a clientStore.
  */
-abstract class EnhancedEventListener(token: String) : EventListener() {
+abstract class EnhancedEventListener constructor(val clientStore: ClientStore) : EventListener() {
 
     /**
-     * A common [ClientStore] for use by a class implementing this one.
-     *
-     * Also used by convenience methods and extensions in this class.
+     * @param token A token used to create a [ClientStore] on demand
      */
-    val clientStore = ClientStore(token)
+    constructor(token: String) : this(ClientStore(token))
 
 
     /**

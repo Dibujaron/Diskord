@@ -40,7 +40,7 @@ import kotlin.coroutines.CoroutineContext
  * Representation and container of a websocket connection to the discord gateway.
  *
  * @property token The user API token.
- * @property eventListener The event listener to call for gateway events.
+ * @property eventListeners The event listeners to call for gateway events.
  * @property sessionId The id of the session, null if this is a new connection.
  * @property sequenceNumber The gateway sequence number, initially null if this is a new connection.
  * @property shardId The id of this shard of the bot, if this is the only shard or DM shard it will be 0.
@@ -55,7 +55,7 @@ import kotlin.coroutines.CoroutineContext
 @OptIn(KtorExperimentalAPI::class, ExperimentalCoroutinesApi::class)
 class DiscordWebSocket(
     private val token: String,
-    private val eventListener: EventListener,
+    private val eventListeners: List<EventListener>,
     private var sessionId: String? = null,
     private var sequenceNumber: Int? = null,
     private val shardId: Int = 0,
@@ -288,7 +288,9 @@ class DiscordWebSocket(
 
         eventListenerScope.launch {
             try {
-                dispatchEvent(eventListener, discordEvent, gatewayMessage.dataPayload)
+                eventListeners.forEach { eventListener ->
+                    dispatchEvent(eventListener, discordEvent, gatewayMessage.dataPayload)
+                }
             } catch (e: Throwable) {
                 logger.warn(e) { "Dispatched event caused exception $e" }
             }
