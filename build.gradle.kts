@@ -5,9 +5,9 @@ plugins {
     `maven-publish`
     signing
 
-    id("org.jetbrains.kotlin.multiplatform") version "1.4.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.4.0"
-    id("org.jetbrains.dokka") version "0.10.1"
+    id("org.jetbrains.kotlin.multiplatform") version "1.4.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.4.10"
+    id("org.jetbrains.dokka") version "1.4.10"
 }
 
 val diskordVersion: String by project
@@ -25,43 +25,33 @@ repositories {
     jcenter() // Needed for dokka
 }
 
-val dokka by tasks.existing(DokkaTask::class) {
-    outputFormat = "html"
-    outputDirectory = "public"
+tasks.withType<DokkaTask>().configureEach {
+    outputDirectory.set(projectDir.resolve("public"))
 
-    multiplatform {
-        val global by creating {
-            noStdlibLink = false
-            noJdkLink = false
+    dokkaSourceSets {
+        configureEach {
+            noStdlibLink.set(false)
+            noJdkLink.set(false)
         }
 
-        val common by creating {
+        named("commonMain") {
             sourceLink {
-                path = "src/commonMain/kotlin"
-                url = "https://gitlab.com/jesselcorbett/diskord/tree/master/src/commonMain/kotlin"
-                lineSuffix = "#L"
+                localDirectory.set(file("src/commonMain/kotlin"))
+                remoteUrl.set(uri("https://gitlab.com/jesselcorbett/diskord/tree/master/src/commonMain/kotlin").toURL())
+                remoteLineSuffix.set("#L")
             }
         }
-
-        val jvm by creating {
+        named("jvmMain") {
             sourceLink {
-                path = "src/jvmMain/kotlin"
-                url = "https://gitlab.com/jesselcorbett/diskord/tree/master/src/jvmMain/kotlin"
-                lineSuffix = "#L"
+                localDirectory.set(file("src/jvmMain/kotlin"))
+                remoteUrl.set(uri("https://gitlab.com/jesselcorbett/diskord/tree/master/src/jvmMain/kotlin").toURL())
+                remoteLineSuffix.set("#L")
             }
         }
     }
-
-    configuration {
-        noStdlibLink = false
-        noJdkLink = false
-    }
 }
 
-val dokkaJavadoc by tasks.registering(DokkaTask::class) {
-    outputFormat = "javadoc"
-    outputDirectory = "$buildDir/javadoc"
-}
+val dokkaJavadoc by tasks.existing(DokkaTask::class)
 
 val jvmJavadocJar by tasks.creating(Jar::class) {
     group = "build"
@@ -97,21 +87,20 @@ kotlin {
             languageSettings.useExperimentalAnnotation("kotlin.Experimental")
 
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinxCoroutinesVersion")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$kotlinSerializationVersion")
-                implementation("io.github.microutils:kotlin-logging-common:1.7.9")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinSerializationVersion")
+                implementation("io.github.microutils:kotlin-logging:2.0.3")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
             }
         }
         commonTest {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion")
+                implementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
                 implementation("org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlinVersion")
                 implementation("io.ktor:ktor-client-mock:$ktorVersion")
-                implementation("com.willowtreeapps.assertk:assertk:0.22")
-                implementation("io.mockk:mockk-common:1.9.3")
+                implementation("com.willowtreeapps.assertk:assertk:0.23")
+                implementation("io.mockk:mockk-common:1.10.2")
             }
         }
 
@@ -119,10 +108,12 @@ kotlin {
             languageSettings.useExperimentalAnnotation("kotlin.Experimental")
 
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kotlinSerializationVersion")
-                implementation("io.github.microutils:kotlin-logging:1.7.9")
+                // TODO - Need to determine if this is still needed. Documentation recommends it can be removed
+                //  but Maven may still need it to resolve dependencies properly.
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$kotlinxCoroutinesVersion")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinSerializationVersion")
+                implementation("io.github.microutils:kotlin-logging-jvm:2.0.3")
+                // TODO - END
                 implementation("org.slf4j:slf4j-api:1.7.30")
                 implementation("io.ktor:ktor-client-cio:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging-jvm:$ktorVersion")
@@ -133,17 +124,16 @@ kotlin {
                 implementation("org.jetbrains.kotlin:kotlin-test-junit5")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinxCoroutinesVersion")
                 implementation("io.ktor:ktor-client-mock-jvm:$ktorVersion")
-                implementation("org.junit.jupiter:junit-jupiter-engine:5.6.1")
-                implementation("com.willowtreeapps.assertk:assertk-jvm:0.22")
-                implementation("io.mockk:mockk:1.9.3")
+                implementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+                implementation("com.willowtreeapps.assertk:assertk-jvm:0.23")
+                implementation("io.mockk:mockk:1.10.2")
                 implementation("org.slf4j:slf4j-simple:1.7.30")
             }
         }
 
         // val jsMain by getting {
         //     dependencies {
-        //         implementation("org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion")
-        //         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.10.0")
+        //         implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:$kotlinSerializationVersion")
         //         implementation("io.github.microutils:kotlin-logging-js:1.6.25")
         //     }
         // }

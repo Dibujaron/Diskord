@@ -116,7 +116,10 @@ class DiscordWebSocket(
 
                         when (frame) {
                             is Frame.Text -> {
-                                receiveMessage(defaultJson.parse(GatewayMessage.serializer(), frame.readText()))
+                                receiveMessage(defaultJson.decodeFromString(
+                                    GatewayMessage.serializer(),
+                                    frame.readText()
+                                ))
                             }
                             is Frame.Binary -> {
                                 TODO("Add support for binary formatted data")
@@ -240,7 +243,7 @@ class DiscordWebSocket(
                 restart()
             }
             OpCode.HELLO -> {
-                initializeSession(defaultJson.fromJson(Hello.serializer(), gatewayMessage.dataPayload!!))
+                initializeSession(defaultJson.decodeFromJsonElement(Hello.serializer(), gatewayMessage.dataPayload!!))
             }
             OpCode.HEARTBEAT_ACK -> {
                 // TODO: We should handle errors to do with a lack of heartbeat ack, possibly restart.
@@ -283,7 +286,7 @@ class DiscordWebSocket(
         logger.debug { "Received Dispatch $discordEvent" }
 
         if (discordEvent == DiscordEvent.READY) {
-            sessionId = defaultJson.fromJson(Ready.serializer(), gatewayMessage.dataPayload).sessionId
+            sessionId = defaultJson.decodeFromJsonElement(Ready.serializer(), gatewayMessage.dataPayload).sessionId
         }
 
         eventListenerScope.launch {
@@ -299,14 +302,15 @@ class DiscordWebSocket(
         logger.debug { "Sending OpCode: $opCode" }
         val eventName = event?.name ?: ""
         val message = GatewayMessage(opCode, data, sequenceNumber, eventName)
-        sendWebsocketMessage!!.invoke(defaultJson.stringify(GatewayMessage.serializer(), message))
+        sendWebsocketMessage!!.invoke(defaultJson.encodeToString(GatewayMessage.serializer(), message))
     }
 
     private suspend fun <T> sendGatewayMessage(opCode: OpCode, data: T, serializer: SerializationStrategy<T>, event: DiscordEvent? = null) {
         logger.debug { "Sending OpCode: $opCode" }
         val eventName = event?.name ?: ""
-        val message = GatewayMessage(opCode, defaultJson.toJson(serializer, data), sequenceNumber, eventName)
-        val payload = defaultJson.stringify(GatewayMessage.serializer(), message)
+        val message = GatewayMessage(opCode,
+            defaultJson.encodeToJsonElement(serializer, data), sequenceNumber, eventName)
+        val payload = defaultJson.encodeToString(GatewayMessage.serializer(), message)
         logger.debug { "Sending payload $payload" }
         sendWebsocketMessage!!.invoke(payload)
     }

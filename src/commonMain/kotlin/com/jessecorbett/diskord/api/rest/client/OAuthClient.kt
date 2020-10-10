@@ -43,7 +43,7 @@ class OAuthClient(
 
         val response = postForm("$baseUrl/oauth2/token", form)
 
-        return defaultJson.parse(BearerToken.serializer(), response.body!!)
+        return defaultJson.decodeFromString(BearerToken.serializer(), response.body!!)
     }
 
     /**

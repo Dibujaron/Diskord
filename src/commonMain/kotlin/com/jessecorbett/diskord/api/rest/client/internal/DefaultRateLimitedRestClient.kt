@@ -27,7 +27,7 @@ private fun captureFailure(code: Int, body: String?) = when (code) {
     401 -> DiscordUnauthorizedException()
     403 -> DiscordBadPermissionsException()
     404 -> DiscordNotFoundException()
-    429 -> defaultJson.parse(RateLimitExceeded.serializer(), body!!).let {
+    429 -> defaultJson.decodeFromString(RateLimitExceeded.serializer(), body!!).let {
         logger.info { "Encountered a rate limit exception" }
         DiscordRateLimitException(it.message, (it.retryAfter + epochMillisNow()) / 1000, it.isGlobal)
     }
@@ -93,7 +93,7 @@ class DefaultRateLimitedRestClient(
             client.getRequest(url, commonHeaders)
         }
 
-        return defaultJson.parse(deserializer, response.body!!)
+        return defaultJson.decodeFromString(deserializer, response.body!!)
     }
 
     /**
@@ -131,7 +131,7 @@ class DefaultRateLimitedRestClient(
         omitNullProperties: Boolean
     ) {
         doRequest(rateLimit) {
-            client.postRequest(url, json(omitNullProperties).stringify(serializer, body), commonHeaders)
+            client.postRequest(url, json(omitNullProperties).encodeToString(serializer, body), commonHeaders)
         }
     }
 
@@ -154,7 +154,7 @@ class DefaultRateLimitedRestClient(
             client.postRequest(url, null, commonHeaders)
         }
 
-        return defaultJson.parse(deserializer, response.body!!)
+        return defaultJson.decodeFromString(deserializer, response.body!!)
     }
 
     /**
@@ -179,10 +179,10 @@ class DefaultRateLimitedRestClient(
         omitNullProperties: Boolean
     ): R {
         val response = doRequest(rateLimit) {
-            client.postRequest(url, json(omitNullProperties).stringify(serializer, body), commonHeaders)
+            client.postRequest(url, json(omitNullProperties).encodeToString(serializer, body), commonHeaders)
         }
 
-        return defaultJson.parse(deserializer, response.body!!)
+        return defaultJson.decodeFromString(deserializer, response.body!!)
     }
 
     /**
@@ -210,13 +210,13 @@ class DefaultRateLimitedRestClient(
     ): R {
         val response = doRequest(rateLimit) {
             val parts = formData {
-                append("payload_json", json(omitNullProperties).stringify(serializer, payload))
+                append("payload_json", json(omitNullProperties).encodeToString(serializer, payload))
             } + block()
 
             client.postMultipartRequest(url, parts, commonHeaders)
         }
 
-        return defaultJson.parse(deserializer, response.body!!)
+        return defaultJson.decodeFromString(deserializer, response.body!!)
     }
 
     /**
@@ -254,7 +254,7 @@ class DefaultRateLimitedRestClient(
         omitNullProperties: Boolean
     ) {
         doRequest(rateLimit) {
-            client.putRequest(url, json(omitNullProperties).stringify(serializer, body), commonHeaders)
+            client.putRequest(url, json(omitNullProperties).encodeToString(serializer, body), commonHeaders)
         }
     }
 
@@ -277,7 +277,7 @@ class DefaultRateLimitedRestClient(
             client.putRequest(url, null, commonHeaders)
         }
 
-        return defaultJson.parse(deserializer, response.body!!)
+        return defaultJson.decodeFromString(deserializer, response.body!!)
     }
 
     /**
@@ -302,10 +302,10 @@ class DefaultRateLimitedRestClient(
         omitNullProperties: Boolean
     ): R {
         val response = doRequest(rateLimit) {
-            client.putRequest(url, json(omitNullProperties).stringify(serializer, body), commonHeaders)
+            client.putRequest(url, json(omitNullProperties).encodeToString(serializer, body), commonHeaders)
         }
 
-        return defaultJson.parse(deserializer, response.body!!)
+        return defaultJson.decodeFromString(deserializer, response.body!!)
     }
 
     /**
@@ -327,7 +327,7 @@ class DefaultRateLimitedRestClient(
         omitNullProperties: Boolean
     ) {
         doRequest(rateLimit) {
-            client.patchRequest(url, json(omitNullProperties).stringify(serializer, body), commonHeaders)
+            client.patchRequest(url, json(omitNullProperties).encodeToString(serializer, body), commonHeaders)
         }
     }
 
@@ -353,10 +353,10 @@ class DefaultRateLimitedRestClient(
         omitNullProperties: Boolean
     ): R {
         val response = doRequest(rateLimit) {
-            client.patchRequest(url, json(omitNullProperties).stringify(serializer, body), commonHeaders)
+            client.patchRequest(url, json(omitNullProperties).encodeToString(serializer, body), commonHeaders)
         }
 
-        return json(omitNullProperties).parse(deserializer, response.body!!)
+        return json(omitNullProperties).decodeFromString(deserializer, response.body!!)
     }
 
     /**
@@ -392,7 +392,7 @@ class DefaultRateLimitedRestClient(
             client.deleteRequest(url, commonHeaders)
         }
 
-        return defaultJson.parse(deserializer, response.body!!)
+        return defaultJson.decodeFromString(deserializer, response.body!!)
     }
 
     /**

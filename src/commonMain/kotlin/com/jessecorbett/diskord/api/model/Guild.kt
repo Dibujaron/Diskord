@@ -1,6 +1,13 @@
 package com.jessecorbett.diskord.api.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class Guild(
@@ -39,7 +46,8 @@ enum class VerificationLevel(val level: Int) {
 }
 
 object VerificationLevelSerializer : KSerializer<VerificationLevel> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("VerificationLevelSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("VerificationLevelSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): VerificationLevel {
         val target = decoder.decodeInt()
@@ -60,7 +68,8 @@ enum class NotificationsLevel(val level: Int) {
 }
 
 object NotificationsLevelSerializer : KSerializer<NotificationsLevel> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("NotificationsLevelSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("NotificationsLevelSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): NotificationsLevel {
         val target = decoder.decodeInt()
@@ -82,7 +91,8 @@ enum class ExplicitContentFilterLevel(val level: Int) {
 }
 
 object ExplicitContentFilterLevelSerializer : KSerializer<ExplicitContentFilterLevel> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("ExplicitContentFilterLevelSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("ExplicitContentFilterLevelSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): ExplicitContentFilterLevel {
         val target = decoder.decodeInt()
@@ -103,7 +113,7 @@ enum class MFALevel(val level: Int) {
 }
 
 object MFALevelSerializer : KSerializer<MFALevel> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("MFALevelSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("MFALevelSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): MFALevel {
         val target = decoder.decodeInt()

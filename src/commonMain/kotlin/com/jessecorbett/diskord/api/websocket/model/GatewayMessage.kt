@@ -1,6 +1,13 @@
 package com.jessecorbett.diskord.api.websocket.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonElement
 
 /**
@@ -86,7 +93,7 @@ enum class OpCode(val code: Int) {
 }
 
 object OpCodeSerializer : KSerializer<OpCode> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("OpCodeSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("OpCodeSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): OpCode {
         val target = decoder.decodeInt()

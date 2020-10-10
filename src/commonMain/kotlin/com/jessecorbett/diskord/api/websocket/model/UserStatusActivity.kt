@@ -1,7 +1,14 @@
 package com.jessecorbett.diskord.api.websocket.model
 
 import com.jessecorbett.diskord.api.model.Emoji
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class UserStatusActivity(
@@ -57,7 +64,7 @@ enum class ActivityType(val code: Int) {
 }
 
 object ActivityTypeSerializer : KSerializer<ActivityType> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("ActivityTypeSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ActivityTypeSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): ActivityType {
         val target = decoder.decodeInt()

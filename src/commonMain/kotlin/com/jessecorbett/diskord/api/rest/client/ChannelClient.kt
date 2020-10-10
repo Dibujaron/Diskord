@@ -12,7 +12,7 @@ import com.jessecorbett.diskord.util.DiskordInternals
 import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 
 /**
  * A REST client for a specific channel and it's content.
@@ -69,7 +69,7 @@ class ChannelClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun getMessages(limit: Int = 50) =
-        getRequest("/channels/$channelId/messages?limit=$limit", Message.serializer().list)
+        getRequest("/channels/$channelId/messages?limit=$limit", ListSerializer(Message.serializer()))
 
     /**
      * Get messages from this channel, around a given message.
@@ -81,7 +81,7 @@ class ChannelClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun getMessagesAround(limit: Int = 50, messageId: String) =
-        getRequest("/channels/$channelId/messages?limit=$limit&around=$messageId", Message.serializer().list)
+        getRequest("/channels/$channelId/messages?limit=$limit&around=$messageId", ListSerializer(Message.serializer()))
 
     /**
      * Get messages from this channel, before a given message.
@@ -93,7 +93,7 @@ class ChannelClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun getMessagesBefore(limit: Int = 50, messageId: String) =
-        getRequest("/channels/$channelId/messages?limit=$limit&before=$messageId", Message.serializer().list)
+        getRequest("/channels/$channelId/messages?limit=$limit&before=$messageId", ListSerializer(Message.serializer()))
 
     /**
      * Get messages from this channel, after a given message.
@@ -105,7 +105,7 @@ class ChannelClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun getMessagesAfter(limit: Int = 50, messageId: String) =
-        getRequest("/channels/$channelId/messages?limit=$limit&after=$messageId", Message.serializer().list)
+        getRequest("/channels/$channelId/messages?limit=$limit&after=$messageId", ListSerializer(Message.serializer()))
 
     /**
      * Get a specific message from this channel.
@@ -211,7 +211,9 @@ class ChannelClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun getMessageReactions(messageId: String, textEmoji: String) =
-        getRequest("/channels/$channelId/messages/$messageId/reactions/${urlEncode(textEmoji)}", User.serializer().list)
+        getRequest("/channels/$channelId/messages/$messageId/reactions/${urlEncode(textEmoji)}",
+            ListSerializer(User.serializer())
+        )
 
     /**
      * Get all reactions from a message for a given custom emoji.
@@ -286,7 +288,7 @@ class ChannelClient(
      * @return The list of invites for this channel.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getInvites() = getRequest("/channels/$channelId/invites", Invite.serializer().list)
+    suspend fun getInvites() = getRequest("/channels/$channelId/invites", ListSerializer(Invite.serializer()))
 
     /**
      * Create an invite for this channel.
@@ -321,7 +323,7 @@ class ChannelClient(
      * @return The pinned messages.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getPinnedMessages() = getRequest("/channels/$channelId/pins", Message.serializer().list)
+    suspend fun getPinnedMessages() = getRequest("/channels/$channelId/pins", ListSerializer(Message.serializer()))
 
     /**
      * Pin a message in this channel.
@@ -371,7 +373,7 @@ class ChannelClient(
      * @return The list webhooks present.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getWebhooks() = getRequest("/channels/$channelId/webhooks", Webhook.serializer().list)
+    suspend fun getWebhooks() = getRequest("/channels/$channelId/webhooks", ListSerializer(Webhook.serializer()))
 
     /**
      * Create a webhook for this channel.

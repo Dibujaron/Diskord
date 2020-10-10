@@ -6,7 +6,7 @@ import com.jessecorbett.diskord.api.rest.*
 import com.jessecorbett.diskord.api.rest.client.internal.DefaultRateLimitedRestClient
 import com.jessecorbett.diskord.api.rest.client.internal.RateLimitedRestClient
 import com.jessecorbett.diskord.util.DiskordInternals
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 
 /*
  * Note: Emoji don't follow standard rate limit behavior, and the API responses may not accurately reflect rate limits.
@@ -36,7 +36,7 @@ class GuildClient(
      * @return A list of the guild's custom emoji
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getEmoji() = getRequest("/guilds/$guildId/emojis", Emoji.serializer().list)
+    suspend fun getEmoji() = getRequest("/guilds/$guildId/emojis", ListSerializer(Emoji.serializer()))
 
     /**
      * Get a custom emoji.
@@ -117,7 +117,7 @@ class GuildClient(
      * @return The guild's channels.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getChannels() = getRequest("/guilds/$guildId/channels", Channel.serializer().list)
+    suspend fun getChannels() = getRequest("/guilds/$guildId/channels", ListSerializer(Channel.serializer()))
 
     /**
      * Create a channel.
@@ -139,7 +139,7 @@ class GuildClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun modifyChannelPositions(positions: List<GuildPosition>) {
-        patchRequest("/guilds/$guildId/channels", positions, GuildPosition.serializer().list)
+        patchRequest("/guilds/$guildId/channels", positions, ListSerializer(GuildPosition.serializer()))
     }
 
     /**
@@ -162,7 +162,9 @@ class GuildClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun getMembers(limit: Int = 1, afterMember: String = "0"): List<GuildMember> {
-        return getRequest("/guilds/$guildId/members?limit=$limit&after=$afterMember", GuildMember.serializer().list)
+        return getRequest("/guilds/$guildId/members?limit=$limit&after=$afterMember",
+            ListSerializer(GuildMember.serializer())
+        )
     }
 
     /**
@@ -261,7 +263,7 @@ class GuildClient(
      * @return The list of bans.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getBans() = getRequest("/guilds/$guildId/bans", Ban.serializer().list)
+    suspend fun getBans() = getRequest("/guilds/$guildId/bans", ListSerializer(Ban.serializer()))
 
     /**
      * Ban a user.
@@ -303,7 +305,7 @@ class GuildClient(
      * @return The list of all roles.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getRoles() = getRequest("/guilds/$guildId/roles", Role.serializer().list)
+    suspend fun getRoles() = getRequest("/guilds/$guildId/roles", ListSerializer(Role.serializer()))
 
     /**
      * Create a role.
@@ -325,7 +327,7 @@ class GuildClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     suspend fun modifyRolePositions(positions: List<GuildPosition>) {
-        patchRequest("/guilds/$guildId/roles", positions, GuildPosition.serializer().list)
+        patchRequest("/guilds/$guildId/roles", positions, ListSerializer(GuildPosition.serializer()))
     }
 
     /**
@@ -376,7 +378,7 @@ class GuildClient(
      * @return The voice regions.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getVoiceRegions() = getRequest("/guilds/$guildId/regions", VoiceRegion.serializer().list)
+    suspend fun getVoiceRegions() = getRequest("/guilds/$guildId/regions", ListSerializer(VoiceRegion.serializer()))
 
     /**
      * Get the guild invites.
@@ -384,7 +386,7 @@ class GuildClient(
      * @return All guild invites.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getInvites() = getRequest("/guilds/$guildId/invites", Invite.serializer().list)
+    suspend fun getInvites() = getRequest("/guilds/$guildId/invites", ListSerializer(Invite.serializer()))
 
     /**
      * Get the list of integrations for the guild.
@@ -392,7 +394,9 @@ class GuildClient(
      * @return The list fo guild integrations.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getIntegrations() = getRequest("/guilds/$guildId/integrations", GuildIntegration.serializer().list)
+    suspend fun getIntegrations() = getRequest("/guilds/$guildId/integrations",
+        ListSerializer(GuildIntegration.serializer())
+    )
 
     /**
      * Create a guild integration.
@@ -476,7 +480,7 @@ class GuildClient(
      * @return All the guild's webhooks.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getWebhooks() = getRequest("/guilds/$guildId/webhooks", Webhook.serializer().list)
+    suspend fun getWebhooks() = getRequest("/guilds/$guildId/webhooks", ListSerializer(Webhook.serializer()))
 
     /**
      * Leave the server.

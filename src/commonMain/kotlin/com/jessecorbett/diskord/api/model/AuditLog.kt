@@ -1,6 +1,13 @@
 package com.jessecorbett.diskord.api.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonElement
 
 @Serializable
@@ -86,7 +93,8 @@ enum class AuditLogActionType(val code: Int) {
 }
 
 object AuditLogActionTypeSerializer : KSerializer<AuditLogActionType> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("AuditLogActionTypeSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("AuditLogActionTypeSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): AuditLogActionType {
         val target = decoder.decodeInt()

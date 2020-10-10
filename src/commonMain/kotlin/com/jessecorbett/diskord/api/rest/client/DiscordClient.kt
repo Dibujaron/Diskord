@@ -12,7 +12,7 @@ import com.jessecorbett.diskord.api.rest.response.PartialGuild
 import com.jessecorbett.diskord.api.websocket.model.GatewayBotUrl
 import com.jessecorbett.diskord.api.websocket.model.GatewayUrl
 import com.jessecorbett.diskord.util.DiskordInternals
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 
 /**
  * A REST client for a user and their discord-wide content.
@@ -112,7 +112,7 @@ class DiscordClient(
         if (after != null) {
             url += "&after=$after"
         }
-        return getRequest(url, PartialGuild.serializer().list)
+        return getRequest(url, ListSerializer(PartialGuild.serializer()))
     }
 
     /**
@@ -122,7 +122,7 @@ class DiscordClient(
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
     @Deprecated("Currently Discord does not return anything from this endpoint. Instead messages in DMs fire the CHANNEL_CREATE event and you can get a specific DM channel using createDM()")
-    suspend fun getDMs() = getRequest("/users/@me/channels", Channel.serializer().list)
+    suspend fun getDMs() = getRequest("/users/@me/channels", ListSerializer(Channel.serializer()))
 
     /**
      * Open a DM channel between the current user and another.
@@ -158,7 +158,7 @@ class DiscordClient(
      * @return The user's connections.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getUserConnections() = getRequest("/users/@me/connections", UserConnection.serializer().list)
+    suspend fun getUserConnections() = getRequest("/users/@me/connections", ListSerializer(UserConnection.serializer()))
 
     /**
      * Get the voice regions available for creating a guild.
@@ -166,5 +166,5 @@ class DiscordClient(
      * @return The list of voice regions.
      * @throws com.jessecorbett.diskord.api.exception.DiscordException
      */
-    suspend fun getVoiceRegions() = getRequest("/voice/regions", VoiceRegion.serializer().list)
+    suspend fun getVoiceRegions() = getRequest("/voice/regions", ListSerializer(VoiceRegion.serializer()))
 }

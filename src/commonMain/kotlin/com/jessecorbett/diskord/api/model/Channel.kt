@@ -1,6 +1,13 @@
 package com.jessecorbett.diskord.api.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class Channel(
@@ -34,7 +41,7 @@ enum class ChannelType(val code: Int) {
 }
 
 object ChannelTypeSerializer : KSerializer<ChannelType> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("ChannelTypeSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ChannelTypeSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): ChannelType {
         val target = decoder.decodeInt()

@@ -1,6 +1,13 @@
 package com.jessecorbett.diskord.api.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class User(
@@ -27,7 +34,7 @@ enum class UserFlags(val code: Int) {
 }
 
 object UserFlagsSerializer : KSerializer<UserFlags> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("UserFlagsSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UserFlagsSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): UserFlags {
         val target = decoder.decodeInt()
@@ -49,7 +56,7 @@ enum class PremiumType(val code: Int) {
 }
 
 object PremiumTypeSerializer : KSerializer<PremiumType> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("PremiumTypeSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("PremiumTypeSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): PremiumType {
         val target = decoder.decodeInt()

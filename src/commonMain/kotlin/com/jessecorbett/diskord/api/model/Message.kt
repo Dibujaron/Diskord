@@ -1,6 +1,13 @@
 package com.jessecorbett.diskord.api.model
 
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class Message(
@@ -40,7 +47,7 @@ enum class MessageType(val code: Int) {
 }
 
 object MessageTypeSerializer : KSerializer<MessageType> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("MessageTypeSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("MessageTypeSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): MessageType {
         val target = decoder.decodeInt()
@@ -69,7 +76,8 @@ enum class MessageActivityType(val code: Int) {
 }
 
 object MessageActivityTypeSerializer : KSerializer<MessageActivityType> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("MessageActivityTypeSerializer", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("MessageActivityTypeSerializer", PrimitiveKind.INT)
 
     override fun deserialize(decoder: Decoder): MessageActivityType {
         val target = decoder.decodeInt()
