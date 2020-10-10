@@ -4,10 +4,7 @@ import com.jessecorbett.diskord.api.DiscordUserType
 import com.jessecorbett.diskord.api.exception.DiscordCompatibilityException
 import com.jessecorbett.diskord.api.model.UserStatus
 import com.jessecorbett.diskord.api.rest.client.DiscordClient
-import com.jessecorbett.diskord.api.websocket.commands.Identify
-import com.jessecorbett.diskord.api.websocket.commands.IdentifyShard
-import com.jessecorbett.diskord.api.websocket.commands.Resume
-import com.jessecorbett.diskord.api.websocket.commands.UpdateStatus
+import com.jessecorbett.diskord.api.websocket.commands.*
 import com.jessecorbett.diskord.api.websocket.events.DiscordEvent
 import com.jessecorbett.diskord.api.websocket.events.Hello
 import com.jessecorbett.diskord.api.websocket.events.Ready
@@ -41,6 +38,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @property token The user API token.
  * @property eventListener The event listener to call for gateway events.
+ * @property intents The gateway intents for the connection.
  * @property sessionId The id of the session, null if this is a new connection.
  * @property sequenceNumber The gateway sequence number, initially null if this is a new connection.
  * @property shardId The id of this shard of the bot, if this is the only shard or DM shard it will be 0.
@@ -56,6 +54,7 @@ import kotlin.coroutines.CoroutineContext
 class DiscordWebSocket(
     private val token: String,
     private val eventListener: EventListener,
+    private val intents: Int,
     private var sessionId: String? = null,
     private var sequenceNumber: Int? = null,
     private val shardId: Int = 0,
@@ -99,7 +98,7 @@ class DiscordWebSocket(
         logger.trace { "Attempting a websocket connection" }
         try {
             socketClient.wss(host = url, port = 443, request = {
-                this.url.parameters["v"] = "6"
+                this.url.parameters["v"] = "8"
                 this.url.parameters["encoding"] = "json"
                 logger.trace { "Building socket HttpRequest" }
             }) {
@@ -116,10 +115,12 @@ class DiscordWebSocket(
 
                         when (frame) {
                             is Frame.Text -> {
-                                receiveMessage(defaultJson.decodeFromString(
-                                    GatewayMessage.serializer(),
-                                    frame.readText()
-                                ))
+                                receiveMessage(
+                                    defaultJson.decodeFromString(
+                                        GatewayMessage.serializer(),
+                                        frame.readText()
+                                    )
+                                )
                             }
                             is Frame.Binary -> {
                                 TODO("Add support for binary formatted data")
@@ -218,8 +219,17 @@ class DiscordWebSocket(
      * @param idleTime How long the user has been idle, in milliseconds.
      * @param activity The activity, if any, that the user is performing.
      */
-    suspend fun setStatus(status: UserStatus, isAfk: Boolean = false, idleTime: Int? = null, activity: UserStatusActivity? = null) {
-        sendGatewayMessage(OpCode.STATUS_UPDATE, UpdateStatus(idleTime, activity, status, isAfk), UpdateStatus.serializer())
+    suspend fun setStatus(
+        status: UserStatus,
+        isAfk: Boolean = false,
+        idleTime: Int? = null,
+        activity: UserStatusActivity? = null
+    ) {
+        sendGatewayMessage(
+            OpCode.STATUS_UPDATE,
+            UpdateStatus(idleTime, activity, status, isAfk),
+            UpdateStatus.serializer()
+        )
     }
 
     private suspend fun receiveMessage(gatewayMessage: GatewayMessage) {
@@ -256,13 +266,22 @@ class DiscordWebSocket(
     }
 
     private suspend fun initializeSession(hello: Hello) {
+        val properties = IdentifyProperties("linux", "diskord", "diskord")
         if (sessionId != null && sequenceNumber != null) { // RESUME
             // Compiler doesn't understand 2 != null's so we have to assert they're non-null
             sendGatewayMessage(OpCode.RESUME, Resume(token, sessionId!!, sequenceNumber!!), Resume.serializer())
         } else if (shardCount > 0) { // IDENTIFY (sharded)
-            sendGatewayMessage(OpCode.IDENTIFY, IdentifyShard(token, listOf(shardId, shardCount)), IdentifyShard.serializer())
+            sendGatewayMessage(
+                OpCode.IDENTIFY,
+                IdentifyShard(token, listOf(shardId, shardCount), intents = intents, properties = properties),
+                IdentifyShard.serializer()
+            )
         } else { // IDENTIFY (unsharded)
-            sendGatewayMessage(OpCode.IDENTIFY, Identify(token), Identify.serializer())
+            sendGatewayMessage(
+                OpCode.IDENTIFY,
+                Identify(token = token, intents = intents, properties = properties),
+                Identify.serializer()
+            )
         }
 
         heartbeatJob?.cancel()
@@ -305,11 +324,19 @@ class DiscordWebSocket(
         sendWebsocketMessage!!.invoke(defaultJson.encodeToString(GatewayMessage.serializer(), message))
     }
 
-    private suspend fun <T> sendGatewayMessage(opCode: OpCode, data: T, serializer: SerializationStrategy<T>, event: DiscordEvent? = null) {
+    private suspend fun <T> sendGatewayMessage(
+        opCode: OpCode,
+        data: T,
+        serializer: SerializationStrategy<T>,
+        event: DiscordEvent? = null
+    ) {
         logger.debug { "Sending OpCode: $opCode" }
-        val eventName = event?.name ?: ""
-        val message = GatewayMessage(opCode,
-            defaultJson.encodeToJsonElement(serializer, data), sequenceNumber, eventName)
+        val eventName = event?.name
+        val message = if (eventName != null) {
+            GatewayMessage(opCode, defaultJson.encodeToJsonElement(serializer, data), sequenceNumber, eventName)
+        } else {
+            GatewayMessage(opCode, defaultJson.encodeToJsonElement(serializer, data), sequenceNumber)
+        }
         val payload = defaultJson.encodeToString(GatewayMessage.serializer(), message)
         logger.debug { "Sending payload $payload" }
         sendWebsocketMessage!!.invoke(payload)

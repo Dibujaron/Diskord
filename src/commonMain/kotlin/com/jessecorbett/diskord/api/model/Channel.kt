@@ -65,6 +65,6 @@ data class Overwrite(
 
 @Serializable
 enum class OverwriteType {
-    @SerialName("role") ROLE,
-    @SerialName("member") MEMBER
+    @SerialName("0") ROLE,
+    @SerialName("1") MEMBER
 }

@@ -20,9 +20,11 @@ val okhttpVersion: String by project
 group = "com.jessecorbett"
 version = diskordVersion
 
-repositories {
-    mavenCentral()
-    jcenter() // Needed for dokka
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter() // Needed for dokka
+    }
 }
 
 tasks.withType<DokkaTask>().configureEach {

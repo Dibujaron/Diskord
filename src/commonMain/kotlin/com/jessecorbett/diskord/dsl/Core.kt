@@ -30,7 +30,7 @@ annotation class DiskordDsl
  */
 @OptIn(KtorExperimentalAPI::class)
 class Bot(token: String, shardId: Int = 0, shardCount: Int = 0) : EnhancedEventListener(token) {
-    private val websocket = DiscordWebSocket(token, this, shardId = shardId, shardCount = shardCount)
+    private val websocket = DiscordWebSocket(token, this, 1 shl 0, shardId = shardId, shardCount = shardCount)
 
     /*
      * Convenience methods for bot implementations
