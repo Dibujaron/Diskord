@@ -1,5 +1,15 @@
 # Changelog
 
+## [Y.Y.Y] - YYYY-YY-YY
+
+### Breaking Changes
+This release adds support for Discord API v8 and Gateway v8.  In these updates, some fields have been removed in favor
+of others or removed without replacements.  Where possible, Diskord has added error-level deprecation annotations to
+help automate migration.
+a
+More information on the Discord API changes can be found at [https://discord.com/developers/docs/change-log#api-and-gateway-v8].
+
+
 ## [X.X.X] - XXXX-XX-XX
 
 ### Added

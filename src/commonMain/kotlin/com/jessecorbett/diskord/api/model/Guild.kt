@@ -14,7 +14,9 @@ data class Guild(
     @SerialName("region") val region: String,
     @SerialName("afk_channel_id") val afkChannelId: String?,
     @SerialName("afk_timeout") val afkTimeoutSeconds: Int,
+    @Deprecated("Removed from the Discord API. Use widgetEnabled as an indirect replacement.", level = DeprecationLevel.ERROR, replaceWith = ReplaceWith("widgetEnabled"))
     @SerialName("embed_enabled") val embedEnabled: Boolean? = null,
+    @Deprecated("Removed from the Discord API. Use widgetChannelId as an indirect replacement.", level = DeprecationLevel.ERROR, replaceWith = ReplaceWith("widgetChannelId"))
     @SerialName("embed_channel_id") val embeddedChannelId: String? = null,
     @SerialName("verification_level") val verificationLevel: VerificationLevel,
     @SerialName("default_message_notifications") val defaultMessageNotificationLevel: NotificationsLevel,

@@ -17,9 +17,11 @@ data class UserStatusActivity(
     @SerialName("secrets") val secrets: RichPresenceSecrets? = null,
     @SerialName("instance") val activityIsInstanced: Boolean? = null,
     @SerialName("flags") val activityFlags: Int? = null,
-    @SerialName("emoji") val emoji: Emoji? = null
+    @SerialName("emoji") val emoji: Emoji? = null,
+    @SerialName("created_at") val createdAt: Long
 )
 
+// FIXME: API docs says these fields are sent as an integer?
 @Serializable
 data class Timestamps(
     @SerialName("start") val start: String? = null,
@@ -53,7 +55,8 @@ enum class ActivityType(val code: Int) {
     STREAMING(1),
     LISTENING(2),
     UNKNOWN(3),
-    CUSTOM_STATUS(4)
+    CUSTOM_STATUS(4),
+    COMPETING(5)
 }
 
 object ActivityTypeSerializer : KSerializer<ActivityType> {

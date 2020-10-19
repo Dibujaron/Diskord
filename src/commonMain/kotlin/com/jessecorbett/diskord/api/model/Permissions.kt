@@ -2,6 +2,8 @@ package com.jessecorbett.diskord.api.model
 
 import kotlinx.serialization.*
 
+// FIXME: Use [Long] or [BigInteger] to store mask information.
+//  https://discord.com/developers/docs/topics/permissions#permissions
 enum class Permission(val mask: Int) {
     /**
      * Allows creation of instant invites.
@@ -48,6 +50,20 @@ enum class Permission(val mask: Int) {
      * Allows for viewing of audit logs.
      */
     VIEW_AUDIT_LOG(0x00000080),
+
+    /**
+     * Allows for using priority speaker in a voice channel.
+     *
+     * Channel Type(s): Voice
+     */
+    PRIORITY_SPEAKER(0x00000100),
+
+    /**
+     * Allows the user to go live.
+     *
+     * Channel Type(s): Voice
+     */
+    STREAM(0x00000200),
 
     /**
      * Allows guild members to view a channel, which includes reading messages in text channels.
@@ -156,13 +172,6 @@ enum class Permission(val mask: Int) {
     USE_VAD(0x02000000),
 
     /**
-     * Allows for using priority speaker in a voice channel.
-     *
-     * Channel Type(s): Voice
-     */
-    PRIORITY_SPEAKER(0x00000100),
-
-    /**
      * Allows for modification of own nickname.
      */
     CHANGE_NICKNAME(0x04000000),
@@ -192,6 +201,8 @@ enum class Permission(val mask: Int) {
     MANAGE_EMOJIS(0x40000000);
 }
 
+// FIXME: Use [Long] or [BigInteger] to store mask information.
+//  https://discord.com/developers/docs/topics/permissions#permissions
 @Serializable(with = PermissionsSerializer::class)
 data class Permissions(val value: Int) {
     operator fun contains(permission: Permission): Boolean {
@@ -237,9 +248,9 @@ data class Permissions(val value: Int) {
 }
 
 object PermissionsSerializer : KSerializer<Permissions> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("Permissions", PrimitiveKind.INT)
+    override val descriptor: SerialDescriptor = PrimitiveDescriptor("Permissions", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder) = Permissions(decoder.decodeInt())
+    override fun deserialize(decoder: Decoder) = Permissions(decoder.decodeString().toInt())
 
-    override fun serialize(encoder: Encoder, value: Permissions) = encoder.encodeInt(value.value)
+    override fun serialize(encoder: Encoder, value: Permissions) = encoder.encodeString(value.value.toString())
 }

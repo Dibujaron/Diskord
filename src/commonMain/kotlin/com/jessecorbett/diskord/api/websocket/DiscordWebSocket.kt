@@ -99,7 +99,7 @@ class DiscordWebSocket(
         logger.trace { "Attempting a websocket connection" }
         try {
             socketClient.wss(host = url, port = 443, request = {
-                this.url.parameters["v"] = "6"
+                this.url.parameters["v"] = "8"
                 this.url.parameters["encoding"] = "json"
                 logger.trace { "Building socket HttpRequest" }
             }) {
